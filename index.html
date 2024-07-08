@@ -36,29 +36,29 @@
     <h1 id="title">Battery Capacity Calculator</h1>
     <form id="calcForm">
         <label for="power" id="powerLabel">Load Power (W):</label>
-        <input type="number" id="power" min="1" step="1.00" required><br>
+        <input type="number" id="power" min="1" required><br>
         
         <label for="voltage" id="voltageLabel">Battery Voltage (V):</label>
-        <input type="number" id="voltage" min="1" step="1.00" required><br>
+        <input type="number" id="voltage" min="1" required><br>
         
         <label for="dischargeTime" id="dischargeTimeLabel">Discharge Time (hours):</label>
-        <input type="number" id="dischargeTime" min="1" step="1.00" required><br>
+        <input type="number" id="dischargeTime" min="1" required><br>
         
         <label for="chargeTime" id="chargeTimeLabel">Charge Time (hours):</label>
-        <input type="number" id="chargeTime" min="0" step="1.00" required><br>
+        <input type="number" id="chargeTime" min="0" required><br>
         
         <label>
             <input type="checkbox" id="efficiencyCheckbox" onclick="toggleEfficiency()"> <span id="efficiencyCheckboxText">Consider inverter efficiency (%)</span>
         </label>
         <label for="efficiency" id="efficiencyLabel" style="display: none;">
-            <input type="number" id="efficiency" min="1" max="100" step="1.00" value="90">
+            <input type="number" id="efficiency" min="1" max="100" value="90">
         </label>
         
         <label>
             <input type="checkbox" id="remainingChargeCheckbox" onclick="toggleRemainingCharge()"> <span id="remainingChargeCheckboxText">Consider remaining charge (%)</span>
         </label>
         <label for="remainingCharge" id="remainingChargeLabel" style="display: none;">
-            <input type="number" id="remainingCharge" min="1" max="100" step="1.00" value="20">
+            <input type="number" id="remainingCharge" min="1" max="100" value="20">
         </label>
         
         <button type="button" onclick="calculateCapacity()" id="calculateButton">Calculate Capacity and Charging Current</button>
