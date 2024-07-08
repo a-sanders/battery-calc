@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор емкости аккумулятора</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px 0;
+        }
+        label {
+            display: block;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Калькулятор емкости аккумулятора</h1>
+    <form id="calcForm">
+        <label for="power">Мощность нагрузки (Вт):</label>
+        <input type="number" id="power" required><br>
+        
+        <label for="voltage">Напряжение аккумулятора (В):</label>
+        <input type="number" id="voltage" required><br>
+        
+        <label for="dischargeTime">Время разряда (ч):</label>
+        <input type="number" id="dischargeTime" required><br>
+        
+        <label for="chargeTime">Время заряда (ч):</label>
+        <input type="number" id="chargeTime" required><br>
+        
+        <label for="efficiencyCheckbox">
+            <input type="checkbox" id="efficiencyCheckbox" onclick="toggleEfficiency()"> Учитывать КПД инвертора (%)
+        </label>
+        <label for="efficiency" id="efficiencyLabel" style="display: none;">
+            <input type="number" id="efficiency" value="90">
+        </label>
+        
+        <label for="remainingChargeCheckbox">
+            <input type="checkbox" id="remainingChargeCheckbox" onclick="toggleRemainingCharge()"> Учитывать неснижаемый заряд (%)
+        </label>
+        <label for="remainingCharge" id="remainingChargeLabel" style="display: none;">
+            <input type="number" id="remainingCharge" value="20">
+        </label>
+        
+        <button type="button" onclick="calculateCapacity()">Рассчитать емкость и зарядный ток</button>
+    </form>
+    <h2 id="result"></h2>
+    <h2 id="chargeResult"></h2>
+
+    <script>
+        function toggleEfficiency() {
+            const efficiencyLabel = document.getElementById('efficiencyLabel');
+            efficiencyLabel.style.display = efficiencyLabel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function toggleRemainingCharge() {
+            const remainingChargeLabel = document.getElementById('remainingChargeLabel');
+            remainingChargeLabel.style.display = remainingChargeLabel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function calculateCapacity() {
+            const power = parseFloat(document.getElementById('power').value);
+            const voltage = parseFloat(document.getElementById('voltage').value);
+            const dischargeTime = parseFloat(document.getElementById('dischargeTime').value);
+            const chargeTime = parseFloat(document.getElementById('chargeTime').value);
+            
+            let efficiency = 1;
+            if (document.getElementById('efficiencyCheckbox').checked) {
+                efficiency = parseFloat(document.getElementById('efficiency').value) / 100;
+            }
+            
+            let remainingCharge = 0;
+            if (document.getElementById('remainingChargeCheckbox').checked) {
+                remainingCharge = parseFloat(document.getElementById('remainingCharge').value) / 100;
+            }
+
+            const current = power / voltage;
+            const dischargeCapacity = current * dischargeTime;
+            const fullCapacity = dischargeCapacity / (1 - remainingCharge);
+            const realCapacity = fullCapacity / efficiency;
+
+            document.getElementById('result').innerText = `Необходимая емкость аккумулятора: ${realCapacity.toFixed(2)} А·ч`;
+
+            const chargeCurrent = realCapacity / chargeTime;
+            const chargePower = chargeCurrent * voltage;
+            const mainsCurrent = chargePower / 220;
+
+            document.getElementById('chargeResult').innerText = `Зарядный ток от сети 220 В: ${mainsCurrent.toFixed(2)} А`;
+        }
+    </script>
+</body>
+</html>
