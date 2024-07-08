@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Калькулятор емкости аккумулятора</title>
+    <title>Battery Capacity Calculator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,38 +17,50 @@
             display: block;
             margin: 10px 0;
         }
+        .language-select {
+            margin-bottom: 20px;
+        }
+        .language-select a {
+            margin-right: 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <h1 id="title">Калькулятор емкости аккумулятора</h1>
+    <div class="language-select">
+        <a href="#" onclick="setLanguage('en')">en</a>
+        <a href="#" onclick="setLanguage('uk')">uk</a>
+        <a href="#" onclick="setLanguage('ru')">ru</a>
+    </div>
+    <h1 id="title">Battery Capacity Calculator</h1>
     <form id="calcForm">
-        <label for="power" id="powerLabel">Мощность нагрузки (Вт):</label>
+        <label for="power" id="powerLabel">Load Power (W):</label>
         <input type="number" id="power" required><br>
         
-        <label for="voltage" id="voltageLabel">Напряжение аккумулятора (В):</label>
+        <label for="voltage" id="voltageLabel">Battery Voltage (V):</label>
         <input type="number" id="voltage" required><br>
         
-        <label for="dischargeTime" id="dischargeTimeLabel">Время разряда (ч):</label>
+        <label for="dischargeTime" id="dischargeTimeLabel">Discharge Time (hours):</label>
         <input type="number" id="dischargeTime" required><br>
         
-        <label for="chargeTime" id="chargeTimeLabel">Время заряда (ч):</label>
+        <label for="chargeTime" id="chargeTimeLabel">Charge Time (hours):</label>
         <input type="number" id="chargeTime" required><br>
         
-        <label for="efficiencyCheckbox">
-            <input type="checkbox" id="efficiencyCheckbox" onclick="toggleEfficiency()"> Учитывать КПД инвертора (%)
+        <label>
+            <input type="checkbox" id="efficiencyCheckbox" onclick="toggleEfficiency()"> <span id="efficiencyCheckboxText">Consider inverter efficiency (%)</span>
         </label>
         <label for="efficiency" id="efficiencyLabel" style="display: none;">
             <input type="number" id="efficiency" value="90">
         </label>
         
-        <label for="remainingChargeCheckbox">
-            <input type="checkbox" id="remainingChargeCheckbox" onclick="toggleRemainingCharge()"> Учитывать неснижаемый заряд (%)
+        <label>
+            <input type="checkbox" id="remainingChargeCheckbox" onclick="toggleRemainingCharge()"> <span id="remainingChargeCheckboxText">Consider remaining charge (%)</span>
         </label>
         <label for="remainingCharge" id="remainingChargeLabel" style="display: none;">
             <input type="number" id="remainingCharge" value="20">
         </label>
         
-        <button type="button" onclick="calculateCapacity()" id="calculateButton">Рассчитать емкость и зарядный ток</button>
+        <button type="button" onclick="calculateCapacity()" id="calculateButton">Calculate Capacity and Charging Current</button>
     </form>
     <h2 id="result"></h2>
     <h2 id="chargeResult"></h2>
@@ -61,11 +73,13 @@
                 voltageLabel: "Battery Voltage (V):",
                 dischargeTimeLabel: "Discharge Time (hours):",
                 chargeTimeLabel: "Charge Time (hours):",
-                efficiencyCheckbox: "Consider inverter efficiency",
+                efficiencyCheckbox: "Consider inverter efficiency (%)",
                 efficiencyLabel: "Inverter Efficiency (%):",
-                remainingChargeCheckbox: "Consider remaining charge",
+                remainingChargeCheckbox: "Consider remaining charge (%)",
                 remainingChargeLabel: "Remaining Charge (%):",
-                calculateButton: "Calculate Capacity and Charging Current"
+                calculateButton: "Calculate Capacity and Charging Current",
+                resultText: "Required battery capacity:",
+                chargeResultText: "Charging current from 220V mains:"
             },
             ru: {
                 title: "Калькулятор емкости аккумулятора",
@@ -73,28 +87,48 @@
                 voltageLabel: "Напряжение аккумулятора (В):",
                 dischargeTimeLabel: "Время разряда (ч):",
                 chargeTimeLabel: "Время заряда (ч):",
-                efficiencyCheckbox: "Учитывать КПД инвертора",
+                efficiencyCheckbox: "Учитывать КПД инвертора (%)",
                 efficiencyLabel: "КПД инвертора (%):",
-                remainingChargeCheckbox: "Учитывать неснижаемый заряд",
+                remainingChargeCheckbox: "Учитывать неснижаемый заряд (%)",
                 remainingChargeLabel: "Процент оставшегося заряда (%):",
-                calculateButton: "Рассчитать емкость и зарядный ток"
+                calculateButton: "Рассчитать емкость и зарядный ток",
+                resultText: "Необходимая емкость аккумулятора:",
+                chargeResultText: "Зарядный ток от сети 220 В:"
+            },
+            uk: {
+                title: "Калькулятор ємності акумулятора",
+                powerLabel: "Потужність навантаження (Вт):",
+                voltageLabel: "Напруга акумулятора (В):",
+                dischargeTimeLabel: "Час розряду (години):",
+                chargeTimeLabel: "Час заряду (години):",
+                efficiencyCheckbox: "Враховувати ККД інвертора (%)",
+                efficiencyLabel: "ККД інвертора (%):",
+                remainingChargeCheckbox: "Враховувати залишковий заряд (%)",
+                remainingChargeLabel: "Залишковий заряд (%):",
+                calculateButton: "Розрахувати ємність і зарядний струм",
+                resultText: "Необхідна ємність акумулятора:",
+                chargeResultText: "Зарядний струм від мережі 220 В:"
             }
         };
 
-        const userLang = navigator.language || navigator.userLanguage;
-        const lang = userLang.startsWith('ru') ? 'ru' : 'en';
+        let currentLang = 'en';
 
         function loadLanguageResources() {
-            document.getElementById('title').textContent = resources[lang].title;
-            document.getElementById('powerLabel').textContent = resources[lang].powerLabel;
-            document.getElementById('voltageLabel').textContent = resources[lang].voltageLabel;
-            document.getElementById('dischargeTimeLabel').textContent = resources[lang].dischargeTimeLabel;
-            document.getElementById('chargeTimeLabel').textContent = resources[lang].chargeTimeLabel;
-            document.getElementById('efficiencyCheckbox').nextSibling.textContent = resources[lang].efficiencyCheckbox;
-            document.getElementById('efficiencyLabel').firstChild.textContent = resources[lang].efficiencyLabel;
-            document.getElementById('remainingChargeCheckbox').nextSibling.textContent = resources[lang].remainingChargeCheckbox;
-            document.getElementById('remainingChargeLabel').firstChild.textContent = resources[lang].remainingChargeLabel;
-            document.getElementById('calculateButton').textContent = resources[lang].calculateButton;
+            document.getElementById('title').textContent = resources[currentLang].title;
+            document.getElementById('powerLabel').textContent = resources[currentLang].powerLabel;
+            document.getElementById('voltageLabel').textContent = resources[currentLang].voltageLabel;
+            document.getElementById('dischargeTimeLabel').textContent = resources[currentLang].dischargeTimeLabel;
+            document.getElementById('chargeTimeLabel').textContent = resources[currentLang].chargeTimeLabel;
+            document.getElementById('efficiencyCheckboxText').textContent = resources[currentLang].efficiencyCheckbox;
+            document.getElementById('efficiencyLabel').firstChild.textContent = resources[currentLang].efficiencyLabel;
+            document.getElementById('remainingChargeCheckboxText').textContent = resources[currentLang].remainingChargeCheckbox;
+            document.getElementById('remainingChargeLabel').firstChild.textContent = resources[currentLang].remainingChargeLabel;
+            document.getElementById('calculateButton').textContent = resources[currentLang].calculateButton;
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            loadLanguageResources();
         }
 
         function toggleEfficiency() {
@@ -128,13 +162,13 @@
             const fullCapacity = dischargeCapacity / (1 - remainingCharge);
             const realCapacity = fullCapacity / efficiency;
 
-            document.getElementById('result').innerText = `Необходимая емкость аккумулятора: ${realCapacity.toFixed(2)} А·ч`;
+            document.getElementById('result').innerText = `${resources[currentLang].resultText} ${realCapacity.toFixed(2)} А·ч`;
 
             const chargeCurrent = realCapacity / chargeTime;
             const chargePower = chargeCurrent * voltage;
             const mainsCurrent = chargePower / 220;
 
-            document.getElementById('chargeResult').innerText = `Зарядный ток от сети 220 В: ${mainsCurrent.toFixed(2)} А`;
+            document.getElementById('chargeResult').innerText = `${resources[currentLang].chargeResultText} ${mainsCurrent.toFixed(2)} А`;
         }
 
         document.addEventListener('DOMContentLoaded', loadLanguageResources);
