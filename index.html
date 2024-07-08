@@ -78,7 +78,8 @@
                 calculateButton: "Calculate Capacity and Charging Current",
                 resultText: "Required battery capacity:",
                 chargeResultText: "Charging current from 220V mains:",
-                capacityUnit: "Ah"
+                unit: "Ah",
+                insufficientData: "Insufficient data"
             },
             ru: {
                 title: "Калькулятор емкости аккумулятора",
@@ -91,7 +92,8 @@
                 calculateButton: "Рассчитать емкость и зарядный ток",
                 resultText: "Необходимая емкость аккумулятора:",
                 chargeResultText: "Зарядный ток от сети 220 В:",
-                capacityUnit: "А·ч"
+                unit: "А·ч",
+                insufficientData: "Недостаточно данных"
             },
             uk: {
                 title: "Калькулятор ємності акумулятора",
@@ -104,7 +106,8 @@
                 calculateButton: "Розрахувати ємність і зарядний струм",
                 resultText: "Необхідна ємність акумулятора:",
                 chargeResultText: "Зарядний струм від мережі 220 В:",
-                capacityUnit: "А·год"
+                unit: "А·год",
+                insufficientData: "Недостатньо даних"
             }
         };
 
@@ -142,30 +145,14 @@
             const dischargeTime = parseFloat(document.getElementById('dischargeTime').value);
             const chargeTime = parseFloat(document.getElementById('chargeTime').value);
             
-            if (isNaN(power) || isNaN(voltage) || isNaN(dischargeTime) || isNaN(chargeTime)) {
-                document.getElementById('result').innerText = "Please enter valid numerical values.";
-                document.getElementById('chargeResult').innerText = "";
-                return;
-            }
-            
             let efficiency = 1;
             if (document.getElementById('efficiencyCheckbox').checked) {
                 efficiency = parseFloat(document.getElementById('efficiency').value) / 100;
-                if (isNaN(efficiency)) {
-                    document.getElementById('result').innerText = "Please enter valid numerical values for efficiency.";
-                    document.getElementById('chargeResult').innerText = "";
-                    return;
-                }
             }
             
             let remainingCharge = 0;
             if (document.getElementById('remainingChargeCheckbox').checked) {
                 remainingCharge = parseFloat(document.getElementById('remainingCharge').value) / 100;
-                if (isNaN(remainingCharge)) {
-                    document.getElementById('result').innerText = "Please enter valid numerical values for remaining charge.";
-                    document.getElementById('chargeResult').innerText = "";
-                    return;
-                }
             }
 
             const current = power / voltage;
@@ -173,13 +160,15 @@
             const fullCapacity = dischargeCapacity / (1 - remainingCharge);
             const realCapacity = fullCapacity / efficiency;
 
-            document.getElementById('result').innerText = `${resources[currentLang].resultText} ${realCapacity.toFixed(2)} ${resources[currentLang].capacityUnit}`;
+            const resultText = isNaN(realCapacity) ? `- (${resources[currentLang].insufficientData})` : `${realCapacity.toFixed(2)} ${resources[currentLang].unit}`;
+            document.getElementById('result').innerText = `${resources[currentLang].resultText} ${resultText}`;
 
             const chargeCurrent = realCapacity / chargeTime;
             const chargePower = chargeCurrent * voltage;
             const mainsCurrent = chargePower / 220;
 
-            document.getElementById('chargeResult').innerText = `${resources[currentLang].chargeResultText} ${mainsCurrent.toFixed(2)} A`;
+            const chargeResultText = isNaN(mainsCurrent) ? `- (${resources[currentLang].insufficientData})` : `${mainsCurrent.toFixed(2)} А`;
+            document.getElementById('chargeResult').innerText = `${resources[currentLang].chargeResultText} ${chargeResultText}`;
         }
 
         function detectLanguage() {
