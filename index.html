@@ -65,6 +65,7 @@
     </form>
     <h2 id="result"></h2>
     <h2 id="chargeResult"></h2>
+    <h2 id="chargePowerResult"></h2>
 
     <script>
         const resources = {
@@ -79,6 +80,7 @@
                 calculateButton: "Calculate Capacity and Charging Current",
                 resultText: "Required battery capacity:",
                 chargeResultText: "Charging current from 220V mains:",
+                chargePowerResultText: "Charging power:",
                 unit: "Ah",
                 insufficientData: "Insufficient data"
             },
@@ -93,6 +95,7 @@
                 calculateButton: "Рассчитать емкость и зарядный ток",
                 resultText: "Необходимая емкость аккумулятора:",
                 chargeResultText: "Зарядный ток от сети 220 В:",
+                chargePowerResultText: "Мощность зарядки:",
                 unit: "А·ч",
                 insufficientData: "Недостаточно данных"
             },
@@ -107,6 +110,7 @@
                 calculateButton: "Розрахувати ємність і зарядний струм",
                 resultText: "Необхідна ємність акумулятора:",
                 chargeResultText: "Зарядний струм від мережі 220 В:",
+                chargePowerResultText: "Потужність зарядки:",
                 unit: "А·год",
                 insufficientData: "Недостатньо даних"
             }
@@ -171,6 +175,9 @@
 
             const chargeResultText = isNaN(mainsCurrent) ? `- (${resources[currentLang].insufficientData})` : `${mainsCurrent.toFixed(2)} А`;
             document.getElementById('chargeResult').innerText = `${resources[currentLang].chargeResultText} ${chargeResultText}`;
+
+            const chargePowerResultText = isNaN(chargePower) ? `- (${resources[currentLang].insufficientData})` : `${chargePower.toFixed(2)} W`;
+            document.getElementById('chargePowerResult').innerText = `${resources[currentLang].chargePowerResultText} ${chargePowerResultText}`;
         }
 
         function detectLanguage() {
