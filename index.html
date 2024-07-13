@@ -29,9 +29,9 @@
 </head>
 <body>
     <div class="language-select">
-        <a href="#" onclick="setLanguage('en')">en</a>
-        <a href="#" onclick="setLanguage('uk')">uk</a>
-        <a href="#" onclick="setLanguage('ru')">ru</a>
+        <a href="#" onclick="setLanguage('en', true)">en</a>
+        <a href="#" onclick="setLanguage('uk', true)">uk</a>
+        <a href="#" onclick="setLanguage('ru', true)">ru</a>
     </div>
     <h1 id="title">Battery Capacity Calculator</h1>
     <form id="calcForm">
@@ -128,13 +128,15 @@
             document.getElementById('remainingChargeCheckboxText').textContent = resources[currentLang].remainingChargeCheckbox;
             document.getElementById('calculateButton').textContent = resources[currentLang].calculateButton;
             //
-            calculateCapacity();
+            calculateCapacity(true);
         }
 
-        function setLanguage(lang) {
+        function setLanguage(lang, needToSetCookie=false) {
             currentLang = lang;
             loadLanguageResources();
-            setCookie('lang', lang, 365);
+            if (needToSetCookie === true){
+                setCookie('lang', lang, 365);
+            }
         }
 
         function toggleEfficiency() {
@@ -147,12 +149,18 @@
             remainingChargeLabel.style.display = remainingChargeLabel.style.display === 'none' ? 'block' : 'none';
         }
 
-        function calculateCapacity() {
+        function calculateCapacity(onlyRecalculate = false) {
             const power = parseFloat(document.getElementById('power').value);
             const voltage = parseFloat(document.getElementById('voltage').value);
             const dischargeTime = parseFloat(document.getElementById('dischargeTime').value);
             const chargeTime = parseFloat(document.getElementById('chargeTime').value);
             
+            if (onlyRecalculate === true){
+                if (!power && !voltage && !dischargeCapacity){
+                    return
+                }
+            }
+
             let efficiency = 1;
             if (document.getElementById('efficiencyCheckbox').checked) {
                 efficiency = parseFloat(document.getElementById('efficiency').value) / 100;
